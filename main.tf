@@ -145,8 +145,8 @@ resource "aws_instance" "etcd" {
       "sudo curl -fsSL https://github.com/coreos/etcd/releases/download/v3.3.8/etcd-v3.3.8-linux-amd64.tar.gz | sudo tar -xvz --strip=1 -f - -C /usr/local/bin etcd-v3.3.8-linux-amd64/etcdctl etcd-v3.3.8-linux-amd64/etcd",
       "sudo useradd -d /var/lib/etcd -s /bin/false -m etcd",
       "sudo cp /tmp/etcd.service /lib/systemd/system/etcd.service",
-      "systemctl enable etcd",
-      "systemctl restart etcd",
+      "sudo systemctl enable etcd",
+      "sudo systemctl restart etcd",
       "wait"      
     ]
   }
@@ -214,7 +214,7 @@ resource "aws_instance" "master" {
       "sudo cp /etc/kubernetes/admin.conf /root/.kube/config && sudo cp /etc/kubernetes/admin.conf /home/ubuntu/.kube/config",
       "sudo chown -R ubuntu.ubuntu /home/ubuntu/.kube",
       "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml",
-      "kubectl apply -f 'https://install.portworx.com/2.0?kbver=1.13.1&k=etcd%3Aetcd%3Ahttp%3A%2F%2Fetcd%3A2379&m=eth0&d=eth0&c=px-demo&stork=true&st=k8s&lh=true'",
+      "kubectl apply -f 'https://install.portworx.com/2.0?kbver=1.13.1&k=etcd%3Ahttp%3A%2F%2F10.0.1.30%3A2379&m=eth0&d=eth0&c=px-demo&stork=true&st=k8s&lh=true'",
       
       # Helm installation
       "sudo snap install helm --classic",
