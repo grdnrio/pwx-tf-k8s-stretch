@@ -159,7 +159,7 @@ resource "aws_instance" "master" {
   }
   
   count = "${length(var.clusters)}"
-
+  depends_on = ["aws_instance.etcd"]
   connection {
     # The default username for our AMI
     user = "ubuntu"
@@ -214,7 +214,7 @@ resource "aws_instance" "master" {
       "sudo cp /etc/kubernetes/admin.conf /root/.kube/config && sudo cp /etc/kubernetes/admin.conf /home/ubuntu/.kube/config",
       "sudo chown -R ubuntu.ubuntu /home/ubuntu/.kube",
       "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml",
-      "kubectl apply -f 'https://install.portworx.com/2.0?kbver=1.13.1&b=true&m=eth0&d=eth0&c=px-demo-${count.index + 1}&stork=true&st=k8s&lh=true'",
+      "kubectl apply -f 'https://install.portworx.com/2.0?kbver=1.13.1&k=etcd%3Aetcd%3Ahttp%3A%2F%2Fetcd%3A2379&m=eth0&d=eth0&c=px-demo&stork=true&st=k8s&lh=true'",
       
       # Helm installation
       "sudo snap install helm --classic",
@@ -272,7 +272,6 @@ resource "aws_instance" "worker" {
       "sudo apt-get install -y kubeadm",
       "sudo systemctl enable docker kubelet && sudo systemctl restart docker kubelet",
       "sudo kubeadm config images pull",
-      "sudo docker pull portworx/oci-monitor:2.0.1 ; sudo docker pull openstorage/stork:2.0.1 ; sudo docker pull portworx/px-enterprise:2.0.1",
       "sudo kubeadm join 10.0.1.${var.clusters[count.index % length(var.clusters)]}0:6443 --token ${var.join_token} --discovery-token-unsafe-skip-ca-verification --node-name ${self.tags.Name}"
     ]
   }
